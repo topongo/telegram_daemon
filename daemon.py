@@ -57,8 +57,12 @@ class Condition:
             return self.stop_return_
 
 
+class ExpiredException(Exception):
+    pass
+
+
 class Fork:
-    def __init__(self, *conditions, completed, exclusive=False):
+    def __init__(self, *conditions, completed, exclusive=False, timeout=None, timeout_callback=None):
         self.exclusive = exclusive
         self.quick_stop = True
         self.conditions = conditions
@@ -72,6 +76,13 @@ class Fork:
             raise TypeError("\"completed\" argument must have the stop_return attribute set")
         self.result = None
         self.done = False
+        if timeout is not None:
+            if not isinstance(timeout, timedelta):
+                raise TypeError(timeout)
+            self.time_target = datetime.now() + timedelta
+        else:
+            self.time_target = None
+
 
     def process(self, u_: TelegramBot.Update):
         if self.done:
@@ -100,10 +111,17 @@ class Fork:
             if self.substitute:
                 self.substitute.join()
                 break
+            if self.expired():
+                raise ExpiredException(self)
             sleep(.2)
 
     def get_result(self):
         return self.result
+
+    def expired(self):
+        if self.time_target is None:
+            return False
+        return datetime.now() > self.time_target:
 
 
 class Forks:
@@ -129,8 +147,13 @@ class Forks:
         self.forks[id_] = new_fork
 
     def send(self, u_: TelegramBot.Update):
+        exp = []
         for id_, f in self.forks.items():
             f.process(u_)
+            if f.expired():
+                exp.append(id_)
+        for id_ in exp:
+            self.detach(id_)
 
     def get(self, id_) -> Fork:
         return self.forks[id_]
