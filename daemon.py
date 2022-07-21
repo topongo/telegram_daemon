@@ -121,7 +121,7 @@ class Fork:
     def expired(self):
         if self.time_target is None:
             return False
-        return datetime.now() > self.time_target:
+        return datetime.now() > self.time_target
 
 
 class Forks:
