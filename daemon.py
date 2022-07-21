@@ -148,7 +148,7 @@ class Forks:
 
 def wait_for(t: TelegramBot,
              *conditions: Condition,
-             timeout=300,
+             timeout=0,
              forks=None):
 
     t.daemon.delay = 0.5
