@@ -79,7 +79,7 @@ class Fork:
         if timeout is not None:
             if not isinstance(timeout, timedelta):
                 raise TypeError(timeout)
-            self.time_target = datetime.now() + timedelta
+            self.time_target = datetime.now() + timeout
         else:
             self.time_target = None
 
