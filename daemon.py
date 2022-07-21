@@ -128,8 +128,8 @@ class Forks:
     def __init__(self):
         self.forks = {}
 
-    def attach(self, *conds: Condition, completed: Condition, exclusive=False, custom_id=None):
-        return self.attach_fork(Fork(*conds, completed=completed, exclusive=exclusive), custom_id)
+    def attach(self, *conds: Condition, completed: Condition, exclusive=False, custom_id=None, timeout=None):
+        return self.attach_fork(Fork(*conds, completed=completed, exclusive=exclusive, timeout=timeout), custom_id)
 
     def attach_fork(self, fork: Fork, custom_id=None):
         if not isinstance(fork, Fork):
